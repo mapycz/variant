@@ -1,10 +1,9 @@
-MASON = .mason/mason
 BOOST_VERSION = 1.62.0
 
 CXX := $(CXX)
 CXX_STD ?= c++11
 
-BOOST_ROOT = $(shell $(MASON) prefix boost $(BOOST_VERSION))
+BOOST_ROOT = /usr
 BOOST_FLAGS = -isystem $(BOOST_ROOT)/include/
 RELEASE_FLAGS = -O3 -DNDEBUG -march=native -DSINGLE_THREADED -fvisibility-inlines-hidden -fvisibility=hidden
 DEBUG_FLAGS = -O0 -g -DDEBUG -fno-inline-functions -fno-omit-frame-pointer -fPIE
@@ -43,12 +42,6 @@ ALL_HEADERS = $(shell find include/mapbox/ '(' -name '*.hpp' ')')
 
 all: out/bench-variant out/unique_ptr_test out/unique_ptr_test out/recursive_wrapper_test out/binary_visitor_test out/lambda_overload_test out/hashable_test
 
-$(MASON):
-	git submodule update --init .mason
-
-mason_packages/headers/boost: $(MASON)
-	$(MASON) install boost $(BOOST_VERSION)
-
 ./deps/gyp:
 	git clone --depth 1 https://chromium.googlesource.com/external/gyp.git ./deps/gyp
 
@@ -57,31 +50,31 @@ gyp: ./deps/gyp
 	make V=1 -C ./out tests
 	./out/$(BUILDTYPE)/tests
 
-out/bench-variant-debug: Makefile mason_packages/headers/boost test/bench_variant.cpp
+out/bench-variant-debug: Makefile test/bench_variant.cpp
 	mkdir -p ./out
 	$(CXX) -o out/bench-variant-debug test/bench_variant.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
-out/bench-variant: Makefile mason_packages/headers/boost test/bench_variant.cpp
+out/bench-variant: Makefile test/bench_variant.cpp
 	mkdir -p ./out
 	$(CXX) -o out/bench-variant test/bench_variant.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
-out/unique_ptr_test: Makefile mason_packages/headers/boost test/unique_ptr_test.cpp
+out/unique_ptr_test: Makefile test/unique_ptr_test.cpp
 	mkdir -p ./out
 	$(CXX) -o out/unique_ptr_test test/unique_ptr_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
-out/recursive_wrapper_test: Makefile mason_packages/headers/boost test/recursive_wrapper_test.cpp
+out/recursive_wrapper_test: Makefile test/recursive_wrapper_test.cpp
 	mkdir -p ./out
 	$(CXX) -o out/recursive_wrapper_test test/recursive_wrapper_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
-out/binary_visitor_test: Makefile mason_packages/headers/boost test/binary_visitor_test.cpp
+out/binary_visitor_test: Makefile test/binary_visitor_test.cpp
 	mkdir -p ./out
 	$(CXX) -o out/binary_visitor_test test/binary_visitor_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
-out/lambda_overload_test: Makefile mason_packages/headers/boost test/lambda_overload_test.cpp
+out/lambda_overload_test: Makefile test/lambda_overload_test.cpp
 	mkdir -p ./out
 	$(CXX) -o out/lambda_overload_test test/lambda_overload_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
-out/hashable_test: Makefile mason_packages/headers/boost test/hashable_test.cpp
+out/hashable_test: Makefile test/hashable_test.cpp
 	mkdir -p ./out
 	$(CXX) -o out/hashable_test test/hashable_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
@@ -135,5 +128,9 @@ pgo: out Makefile
 	$(CXX) -o out/bench-variant test/bench_variant.cpp -I./include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS) -pg -fprofile-generate
 	./test-variant 500000 >/dev/null 2>/dev/null
 	$(CXX) -o out/bench-variant test/bench_variant.cpp -I./include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS) -fprofile-use
+
+install:
+	install -m 0755 -o root -g root -d $(DESTDIR)/usr/include/mapbox
+	install -m 0644 -o root -g root include/mapbox/* $(DESTDIR)/usr/include/mapbox
 
 .PHONY: sizes test
