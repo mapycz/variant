@@ -1,0 +1,14 @@
+Source: szn-libmapbox-variant
+Maintainer: Jiri Drbalek <jiri.drbalek@firma.seznam.cz>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends:
+    debhelper (>= 9),
+    g++
+
+Package: szn-libmapbox-variant-dev
+Section: libdevel
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: An header-only alternative to boost::variant for C++11 and C++14
