@@ -3,8 +3,6 @@ BOOST_VERSION = 1.62.0
 CXX := $(CXX)
 CXX_STD ?= c++11
 
-BOOST_ROOT = /usr
-BOOST_FLAGS = -isystem $(BOOST_ROOT)/include/
 RELEASE_FLAGS = -O3 -DNDEBUG -march=native -DSINGLE_THREADED -fvisibility-inlines-hidden -fvisibility=hidden
 DEBUG_FLAGS = -O0 -g -DDEBUG -fno-inline-functions -fno-omit-frame-pointer -fPIE
 WARNING_FLAGS = -Werror -Wall -Wextra -pedantic \
@@ -52,31 +50,31 @@ gyp: ./deps/gyp
 
 out/bench-variant-debug: Makefile test/bench_variant.cpp
 	mkdir -p ./out
-	$(CXX) -o out/bench-variant-debug test/bench_variant.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
+	$(CXX) -o out/bench-variant-debug test/bench_variant.cpp -I./include -I./test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
 out/bench-variant: Makefile test/bench_variant.cpp
 	mkdir -p ./out
-	$(CXX) -o out/bench-variant test/bench_variant.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
+	$(CXX) -o out/bench-variant test/bench_variant.cpp -I./include -I./test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
 out/unique_ptr_test: Makefile test/unique_ptr_test.cpp
 	mkdir -p ./out
-	$(CXX) -o out/unique_ptr_test test/unique_ptr_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
+	$(CXX) -o out/unique_ptr_test test/unique_ptr_test.cpp -I./include -I./test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
 out/recursive_wrapper_test: Makefile test/recursive_wrapper_test.cpp
 	mkdir -p ./out
-	$(CXX) -o out/recursive_wrapper_test test/recursive_wrapper_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
+	$(CXX) -o out/recursive_wrapper_test test/recursive_wrapper_test.cpp -I./include -I./test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
 out/binary_visitor_test: Makefile test/binary_visitor_test.cpp
 	mkdir -p ./out
-	$(CXX) -o out/binary_visitor_test test/binary_visitor_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
+	$(CXX) -o out/binary_visitor_test test/binary_visitor_test.cpp -I./include -I./test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
 out/lambda_overload_test: Makefile test/lambda_overload_test.cpp
 	mkdir -p ./out
-	$(CXX) -o out/lambda_overload_test test/lambda_overload_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
+	$(CXX) -o out/lambda_overload_test test/lambda_overload_test.cpp -I./include -I./test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
 out/hashable_test: Makefile test/hashable_test.cpp
 	mkdir -p ./out
-	$(CXX) -o out/hashable_test test/hashable_test.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
+	$(CXX) -o out/hashable_test test/hashable_test.cpp -I./include -I./test/include $(FINAL_CXXFLAGS) $(LDFLAGS) $(BOOST_FLAGS)
 
 bench: out/bench-variant out/unique_ptr_test out/unique_ptr_test out/recursive_wrapper_test out/binary_visitor_test
 	./out/bench-variant 100000
@@ -86,11 +84,11 @@ bench: out/bench-variant out/unique_ptr_test out/unique_ptr_test out/recursive_w
 
 out/unit.o: Makefile test/unit.cpp
 	mkdir -p ./out
-	$(CXX) -c -o $@ test/unit.cpp -isystem test/include $(FINAL_CXXFLAGS)
+	$(CXX) -c -o $@ test/unit.cpp -I./test/include $(FINAL_CXXFLAGS)
 
 out/%.o: test/t/%.cpp Makefile $(ALL_HEADERS)
 	mkdir -p ./out
-	$(CXX) -c -o $@ $< -Iinclude -isystem test/include $(FINAL_CXXFLAGS)
+	$(CXX) -c -o $@ $< -Iinclude -I./test/include $(FINAL_CXXFLAGS)
 
 out/unit: out/unit.o out/binary_visitor_1.o out/binary_visitor_2.o out/binary_visitor_3.o out/binary_visitor_4.o out/binary_visitor_5.o out/binary_visitor_6.o out/issue21.o out/issue122.o out/mutating_visitor.o out/optional.o out/recursive_wrapper.o out/sizeof.o out/unary_visitor.o out/variant.o
 	mkdir -p ./out
@@ -101,7 +99,7 @@ test: out/unit
 
 coverage:
 	mkdir -p ./out
-	$(CXX) -o out/cov-test --coverage test/unit.cpp test/t/*.cpp -I./include -isystem test/include $(FINAL_CXXFLAGS) $(LDFLAGS)
+	$(CXX) -o out/cov-test --coverage test/unit.cpp test/t/*.cpp -I./include -I./test/include $(FINAL_CXXFLAGS) $(LDFLAGS)
 
 sizes: Makefile
 	mkdir -p ./out
